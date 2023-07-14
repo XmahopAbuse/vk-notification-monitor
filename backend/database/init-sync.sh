@@ -1,0 +1,9 @@
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+CREATE TABLE sync (
+  "id" SERIAL NOT NULL PRIMARY KEY,
+  "updated_at" TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+EOSQL
+
