@@ -12,19 +12,9 @@ services:
   db:
     image: postgres:15
     restart: always
-    # ports:
-    #   - 5432:5432
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_USER: monitor
       POSTGRES_DB: monitor
     volumes:
       - ./backend/database:/docker-entrypoint-initdb.d
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - "8080:8080"
-
-networks:
-  vk-monitor:
