@@ -5,7 +5,7 @@ import KeywordsList from '../components/KeywordsList';
 import { VscSettingsGear } from 'react-icons/vsc';
 
 export default function Home() {
-  const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost/';
+  const apiUrl = process.env.REACT_APP_API_URL || '';
   return (
     <div>
       <div className="row">
