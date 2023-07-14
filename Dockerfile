@@ -10,11 +10,11 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
 
 FROM node:20-alpine3.17 as frontend-builder
-#RUN npm ci --only=production
+
 WORKDIR /app/frontend
 
 COPY ./frontend . 
-
+RUN npm install --only=production
 WORKDIR /app/frontend
 
 RUN npm run build 
