@@ -1,6 +1,7 @@
 # VK Notification Monitor
 
 Простой сервис отслеживания упоминайний по ключевым словам в указанных сообществах в социальной сети ВКонтакте, с возможностью уведомления в Telegram
+![Image alt](https://github.com/XmahopAbuse/vk-notification-monitor/raw/main/example.jpg)
 
 ## Требования
 
