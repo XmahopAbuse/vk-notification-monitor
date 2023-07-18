@@ -23,6 +23,7 @@ type Config struct {
 	ENABLE_NOTIFICATIONS int
 	TELEGRAM_BOT_TOKEN   string
 	SYNC_INTERVAL        int
+	SENDERS              string
 }
 
 func NewConfig() *Config {
@@ -51,6 +52,7 @@ func NewConfig() *Config {
 		ENABLE_NOTIFICATIONS: utils.LookupEnvInt("ENABLE_NOTIFICATIONS", 0),
 		TELEGRAM_BOT_TOKEN:   utils.LookupEnvString("TELEGRAM_BOT_TOKEN", ""),
 		SYNC_INTERVAL:        utils.LookupEnvInt("SYNC_INTERVAL", 320),
+		SENDERS:              utils.LookupEnvString("SENDERS", ""),
 	}
 
 	return &cfg

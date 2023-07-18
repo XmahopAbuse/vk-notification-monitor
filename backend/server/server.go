@@ -7,9 +7,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/mymmrac/telego"
 	"net/http"
+	"strings"
 	"time"
 	"vk-notification-monitor/config"
 	"vk-notification-monitor/entity/vkapi"
+	"vk-notification-monitor/pkg/sender"
+	"vk-notification-monitor/pkg/syncpost"
 	"vk-notification-monitor/server/handlers"
 	"vk-notification-monitor/store"
 )
@@ -19,7 +22,7 @@ type Server struct {
 	Repository   store.Repository
 	vkapi        vkapi.VKApi
 	EnableNotify int
-	telegramBot  *telego.Bot
+	senders      []sender.Sender
 	config       *config.Config
 }
 
@@ -52,8 +55,8 @@ func (s *Server) Run() {
 	// Запускаем тикер для фоновых задач
 	s.RunTicker(s.config.SYNC_INTERVAL)
 
-	// Получаем телеграм токен и инициализируем бота
-	s.telegramBot, _ = telego.NewBot(s.config.TELEGRAM_BOT_TOKEN, telego.WithDefaultDebugLogger())
+	// Инициализируем сервисы уведомлений
+	s.initSenders()
 
 	// Запускаем роутер
 	s.router.Run(s.config.SERVER_ADDRESS)
@@ -65,11 +68,34 @@ func (s *Server) RunTicker(interval int) {
 
 	go func() {
 		for range ticker {
-			fmt.Println(time.Now())
-			s.Repository.Post.SyncPostsByKeywords(&s.Repository.Group, &s.Repository.Keyword, &s.Repository.Wall, &s.Repository.Post, &s.Repository.Notification, s.telegramBot, s.config.ENABLE_NOTIFICATIONS)
+			groups, _ := s.Repository.Group.GetAllGroups()
+			keywords, _ := s.Repository.Keyword.GetAll()
+			syncpost.SyncPostsByKeywords(groups, keywords, &s.Repository.Wall, &s.Repository.Post, s.config.ENABLE_NOTIFICATIONS, s.senders)
 		}
 	}()
 
+}
+
+func (s *Server) initSenders() error {
+	if s.config.ENABLE_NOTIFICATIONS == 1 {
+		senders := strings.Split(s.config.SENDERS, ",")
+		for _, name := range senders {
+			switch name {
+			case "telegram":
+				bot, err := telego.NewBot(s.config.TELEGRAM_BOT_TOKEN, telego.WithDefaultLogger(false, true))
+				if err != nil {
+					return err
+				}
+				sn := sender.NewTelegramSender(bot)
+				s.senders = append(s.senders, sn)
+			default:
+				return fmt.Errorf("Unknown sender type")
+				// here you can add some of you senders
+			}
+		}
+	}
+
+	return nil
 }
 
 func (s *Server) initRoutes() {
@@ -100,7 +126,7 @@ func (s *Server) initRoutes() {
 	//Posts group
 	postsGroup := v1.Group("/posts")
 	// Ищет посты по ключевым словам
-	postsGroup.POST("/sync", handlers.SyncPostsByKeywords(&s.Repository))
+	postsGroup.POST("/sync", handlers.SyncPostsByKeywords(&s.Repository, s.config, s.senders))
 	// Отдаем слова из локальной БД
 	postsGroup.GET("/get", handlers.GetPost(&s.Repository))
 	postsGroup.PATCH("/update/:hash", handlers.UpdatePost(&s.Repository))
