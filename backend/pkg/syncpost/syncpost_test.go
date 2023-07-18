@@ -77,7 +77,7 @@ func TestSyncPostsByKeywords(t *testing.T) {
 	wa := MockWallRepository{}
 	p := MockPostRepository{}
 
-	posts, err := SyncPostsByKeywords(groups, keywords, &wa, p, nil, 0)
+	posts, err := SyncPostsByKeywords(groups, keywords, &wa, p, 0, nil)
 
 	// Проверка результата
 	require.NotEmpty(t, posts, "Expected non-empty posts array")
