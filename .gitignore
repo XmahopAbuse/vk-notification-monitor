@@ -5,3 +5,4 @@
 /backend/.idea
 /backend/.env
 /frontend/.env
+docker-compose.yml
