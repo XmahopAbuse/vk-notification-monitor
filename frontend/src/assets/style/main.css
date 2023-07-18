@@ -14983,3 +14983,11 @@ input {
   margin-top: 10px;
 
 }
+
+.card-body {
+  position: relative !important;
+  min-height: 400px;
+  max-height: 90vh;
+  overflow-x: auto;
+}
+
