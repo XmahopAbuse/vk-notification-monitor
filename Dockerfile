@@ -24,6 +24,7 @@ FROM alpine:3
 WORKDIR /app
 
 COPY --from=backend-builder /app/backend/main /app
+COPY --from=backend-builder /app/backend/migrations /app/migrations
 COPY --from=frontend-builder /app/frontend/build/ /app/frontend/
 
 

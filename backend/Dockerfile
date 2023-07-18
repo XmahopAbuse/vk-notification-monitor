@@ -10,4 +10,5 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 WORKDIR /app
 COPY --from=builder /app/main .
+COPY migrations /app/migrations
 CMD ["./main"]
