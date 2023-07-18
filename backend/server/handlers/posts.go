@@ -7,16 +7,17 @@ import (
 	"strconv"
 	"vk-notification-monitor/config"
 	"vk-notification-monitor/entity"
+	"vk-notification-monitor/pkg/sender"
 	"vk-notification-monitor/pkg/syncpost"
 	"vk-notification-monitor/store"
 )
 
-func SyncPostsByKeywords(repo *store.Repository, config *config.Config) gin.HandlerFunc {
+func SyncPostsByKeywords(repo *store.Repository, config *config.Config, senders []sender.Sender) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		groups, _ := repo.Group.GetAllGroups()
 		keywords, _ := repo.Keyword.GetAll()
-		posts, err := syncpost.SyncPostsByKeywords(*groups, keywords, &repo.Wall, &repo.Post, &repo.Notification, config.ENABLE_NOTIFICATIONS)
+		posts, err := syncpost.SyncPostsByKeywords(groups, keywords, &repo.Wall, &repo.Post, config.ENABLE_NOTIFICATIONS, senders)
 		if err != nil {
 			c.JSON(500, "Error")
 			return

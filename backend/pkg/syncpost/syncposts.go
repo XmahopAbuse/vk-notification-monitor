@@ -8,11 +8,12 @@ import (
 	"sync"
 	"time"
 	"vk-notification-monitor/entity"
+	"vk-notification-monitor/pkg/sender"
 	"vk-notification-monitor/usecase"
 	"vk-notification-monitor/usecase/vkapi"
 )
 
-func SyncPostsByKeywords(groups []entity.Group, keywords []string, wa vkapi.WallRepository, p usecase.PostRepository, n *usecase.NotificationUsecase, notify int) ([]entity.Post, error) {
+func SyncPostsByKeywords(groups []entity.Group, keywords []string, wa vkapi.WallRepository, p usecase.PostRepository, isNotify int, senders []sender.Sender) ([]entity.Post, error) {
 	ac := ahocorasick.NewStringMatcher(keywords)
 	errCh := make(chan error, len(groups))
 	posts := []entity.Post{}
@@ -26,7 +27,7 @@ func SyncPostsByKeywords(groups []entity.Group, keywords []string, wa vkapi.Wall
 			if err != nil {
 				errCh <- err
 			}
-			processedPosts := processWallPosts(wall, ac, group, p)
+			processedPosts := processWallPosts(wall, ac, group, p, senders)
 			posts = append(posts, processedPosts...)
 		}(group)
 	}
@@ -36,7 +37,7 @@ func SyncPostsByKeywords(groups []entity.Group, keywords []string, wa vkapi.Wall
 	return posts, nil
 }
 
-func processWallPosts(wall *entity.Wall, matcher *ahocorasick.Matcher, group entity.Group, p usecase.PostRepository) []entity.Post {
+func processWallPosts(wall *entity.Wall, matcher *ahocorasick.Matcher, group entity.Group, p usecase.PostRepository, senders []sender.Sender) []entity.Post {
 	processedPosts := []entity.Post{}
 	for _, item := range wall.Response.Items {
 		text := strings.ToLower(item.Text)
@@ -65,6 +66,11 @@ func processWallPosts(wall *entity.Wall, matcher *ahocorasick.Matcher, group ent
 					continue
 				}
 				processedPosts = append(processedPosts, post)
+
+				// Отправка уведомлений
+				for _, sender := range senders {
+					sender.Send()
+				}
 			}
 		}
 	}

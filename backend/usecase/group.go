@@ -16,7 +16,7 @@ import (
 type GroupRepository interface {
 	Add(url string) (*entity.Group, error)
 	GetInfoByAddressVKAPI(address string) (*entity.Group, error)
-	GetAllGroups() (*[]entity.Group, error)
+	GetAllGroups() ([]entity.Group, error)
 	GetGroupAsAuthor(id int) (*entity.Author, error)
 	GetById(id string) (*entity.Group, error)
 	DeleteByAddress(address string) error
@@ -105,7 +105,7 @@ func (g *GroupUsecase) GetInfoByAddressVKAPI(address string) (*entity.Group, err
 	return &group, nil
 }
 
-func (g *GroupUsecase) GetAllGroups() (*[]entity.Group, error) {
+func (g *GroupUsecase) GetAllGroups() ([]entity.Group, error) {
 	rows, err := g.db.Query("SELECT group_id, group_address, photo_url, name, full_address FROM groups")
 	if err != nil {
 		return nil, err
@@ -124,7 +124,7 @@ func (g *GroupUsecase) GetAllGroups() (*[]entity.Group, error) {
 		groups = append(groups, group)
 	}
 
-	return &groups, nil
+	return groups, nil
 }
 
 func (g *GroupUsecase) GetGroupAsAuthor(id int) (*entity.Author, error) {
