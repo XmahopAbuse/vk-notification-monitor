@@ -5,14 +5,18 @@ import (
 	"log"
 	"math"
 	"strconv"
+	"vk-notification-monitor/config"
 	"vk-notification-monitor/entity"
+	"vk-notification-monitor/pkg/syncpost"
 	"vk-notification-monitor/store"
 )
 
-func SyncPostsByKeywords(repo *store.Repository) gin.HandlerFunc {
+func SyncPostsByKeywords(repo *store.Repository, config *config.Config) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		posts, err := repo.Post.SyncPostsByKeywords(&repo.Group, &repo.Keyword, &repo.Wall, &repo.Post, &repo.Notification, nil, 0)
+		groups, _ := repo.Group.GetAllGroups()
+		keywords, _ := repo.Keyword.GetAll()
+		posts, err := syncpost.SyncPostsByKeywords(*groups, keywords, &repo.Wall, &repo.Post, &repo.Notification, config.ENABLE_NOTIFICATIONS)
 		if err != nil {
 			c.JSON(500, "Error")
 			return

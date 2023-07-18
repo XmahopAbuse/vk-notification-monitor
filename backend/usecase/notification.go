@@ -3,6 +3,7 @@ package usecase
 import (
 	"database/sql"
 	"github.com/Masterminds/squirrel"
+	"github.com/mymmrac/telego"
 	"log"
 	"vk-notification-monitor/entity"
 )
@@ -84,4 +85,13 @@ func (notificator *NotificationUsecase) GetAll() ([]entity.Notification, error) 
 
 	return notifications, nil
 
+}
+
+func (notificator *NotificationUsecase) sendNotifications(post entity.Post, notifyUsers []entity.Notification, tgbot *telego.Bot) {
+	for _, user := range notifyUsers {
+		switch user.Type {
+		case "telegram":
+			log.Println("TELEGRAM SEND")
+		}
+	}
 }

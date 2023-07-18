@@ -13,6 +13,10 @@ import (
 	"vk-notification-monitor/entity/vkapi"
 )
 
+type WallRepository interface {
+	GetWallPostsByDomain(domain string) (*entity.Wall, error)
+}
+
 type WallUsecase struct {
 	db    *sql.DB
 	vkapi vkapi.VKApi

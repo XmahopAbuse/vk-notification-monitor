@@ -13,6 +13,15 @@ import (
 	"vk-notification-monitor/entity/vkapi"
 )
 
+type GroupRepository interface {
+	Add(url string) (*entity.Group, error)
+	GetInfoByAddressVKAPI(address string) (*entity.Group, error)
+	GetAllGroups() (*[]entity.Group, error)
+	GetGroupAsAuthor(id int) (*entity.Author, error)
+	GetById(id string) (*entity.Group, error)
+	DeleteByAddress(address string) error
+}
+
 type GroupUsecase struct {
 	db    *sql.DB
 	vkapi vkapi.VKApi

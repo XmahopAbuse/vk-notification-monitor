@@ -1,21 +1,23 @@
 version: "3.1"
 
 services:
-  app:
-    build: .
-    ports:
-      - 80:8000
-    env_file:
-      - .env
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -h db -U $DB_USER" ]
-      interval: 10s
-      timeout: 10s
-      retries: 3
-    restart: always
+  # app:
+  #   build: .
+  #   ports:
+  #     - 80:8000
+  #   env_file:
+  #     - .env
+  #   healthcheck:
+  #     test: [ "CMD-SHELL", "pg_isready -h db -U $DB_USER" ]
+  #     interval: 10s
+  #     timeout: 10s
+  #     retries: 3
+  #   restart: always
   db:
     image: postgres:15
     restart: always
+    ports:
+      - 5432:5432
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_USER: monitor
